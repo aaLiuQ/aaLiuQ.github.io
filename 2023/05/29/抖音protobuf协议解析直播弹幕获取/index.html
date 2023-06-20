@@ -1,0 +1,228 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>抖音protobuf协议解析直播弹幕获取 | Spider Blog</title><meta name="author" content="LLi"><meta name="copyright" content="LLi"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="解析流程：绿色表示客户端消息发给服务器，红色表示服务器下发数据给客户端   从第一个堆栈开始看起，下面的四个方法，onError(e)，onMessage(e)，onOpen(e)，onClose(e)分别对应着websocket的四个触发事件，分别是 连接错误，接受数据，连接成功，连接关闭  我们直接在 onOpen 打上断点，查看上一个调用堆栈，看一下绑定的方法   onOpen方法里面都是一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="抖音protobuf协议解析直播弹幕获取">
+<meta property="og:url" content="http://example.com/2023/05/29/%E6%8A%96%E9%9F%B3protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%9B%B4%E6%92%AD%E5%BC%B9%E5%B9%95%E8%8E%B7%E5%8F%96/index.html">
+<meta property="og:site_name" content="Spider Blog">
+<meta property="og:description" content="解析流程：绿色表示客户端消息发给服务器，红色表示服务器下发数据给客户端   从第一个堆栈开始看起，下面的四个方法，onError(e)，onMessage(e)，onOpen(e)，onClose(e)分别对应着websocket的四个触发事件，分别是 连接错误，接受数据，连接成功，连接关闭  我们直接在 onOpen 打上断点，查看上一个调用堆栈，看一下绑定的方法   onOpen方法里面都是一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/image-20230619165907932.png">
+<meta property="article:published_time" content="2023-05-29T07:39:14.000Z">
+<meta property="article:modified_time" content="2023-06-20T03:46:21.188Z">
+<meta property="article:author" content="LLi">
+<meta property="article:tag" content="protobuf">
+<meta property="article:tag" content="抖音">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/image-20230619165907932.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2023/05/29/%E6%8A%96%E9%9F%B3protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%9B%B4%E6%92%AD%E5%BC%B9%E5%B9%95%E8%8E%B7%E5%8F%96/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '抖音protobuf协议解析直播弹幕获取',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-06-20 11:46:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/static/css/custom.css"><link rel="stylesheet" href="/static/css/footer.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="Spider Blog"><span class="site-name">Spider Blog</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">抖音protobuf协议解析直播弹幕获取</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">发表于</span><time datetime="2023-05-29T07:39:14.000Z" title="发表于 2023-05-29 15:39:14">2023-05-29</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/js%E9%80%86%E5%90%91/">js逆向</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.7k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="抖音protobuf协议解析直播弹幕获取"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="post-content" id="article-container"><h3 id="解析流程："><a href="#解析流程：" class="headerlink" title="解析流程："></a>解析流程：</h3><p><strong>绿色表示客户端消息发给服务器，红色表示服务器下发数据给客户端</strong></p>
+<p><img src="/images/image-20230619165907932.png" alt="image-20230619165907932"></p>
+<p><img src="/images/image-20230619165940578.png" alt="image-20230619165940578"></p>
+<p>从第一个堆栈开始看起，下面的四个方法，<code>onError(e)，onMessage(e)，onOpen(e)，onClose(e)</code>分别对应着websocket的四个触发事件，分别是 连接错误，接受数据，连接成功，连接关闭</p>
+<p><img src="/images/image-20230619170121530.png" alt="image-20230619170121530"></p>
+<p>我们直接在 onOpen 打上断点，查看上一个调用堆栈，看一下绑定的方法</p>
+<p><img src="/images/image-20230619170908161.png" alt="image-20230619170908161"></p>
+<p><img src="/images/image-20230619171155888.png" alt="image-20230619171155888"></p>
+<p>onOpen方法里面都是一些赋值操作，我们直接看 ping方法，我们可以看到关键字 <code>serializeBinary</code> 很明显在这里做了序列化操作 我们看一下 e.serializeBinary() 方法，我们在这一块能看到下面是序列化操作，上面是反序列化操作，后面要跟着写proto文件</p>
+<p><img src="/images/image-20230619171647356.png" alt="image-20230619171647356"></p>
+<p>接着我们看一下第二个堆栈<code>fetchSocketServer</code>  这个方法处理数据接收，这里同样绑定四个事件，我们直接看 <code>bindClientMessage</code> 方法</p>
+<p><img src="/images/image-20230619175330246.png" alt="image-20230619175330246"></p>
+<p>这里就是websocket的消息处理部分了，我们看下代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> a = p.<span class="hljs-property">PushFrame</span>.<span class="hljs-title function_">deserializeBinary</span>(e.<span class="hljs-property">data</span>) <span class="hljs-comment">//反序列化得到数组对象</span><br> , r = o.<span class="hljs-property">Response</span>.<span class="hljs-title function_">deserializeBinary</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) &#123;<br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> t <span class="hljs-keyword">of</span> <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">values</span>(e.<span class="hljs-title function_">getHeadersList</span>()))<br>     f (<span class="hljs-string">&quot;compress_type&quot;</span> === t.<span class="hljs-title function_">getKey</span>() &amp;&amp; <span class="hljs-string">&quot;gzip&quot;</span> === t.<span class="hljs-title function_">getValue</span>())<br>                                <span class="hljs-keyword">return</span> !<span class="hljs-number">0</span>;<br>                        <span class="hljs-keyword">return</span> !<span class="hljs-number">1</span><br>&#125;(a) ?<br>(<span class="hljs-number">0</span>,n.<span class="hljs-property">ec</span>)(a.<span class="hljs-title function_">getPayload</span>()) : a.<span class="hljs-title function_">getPayload_asU8</span>()); <span class="hljs-comment">//选择表达式，如果真就走第一个，假就走后面那个，得到的值再反序列化得到a，这里应该都是压缩过的，所以都会走第一个，所以需要再去看一下 n.ec方法</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 第二段</span><br><span class="hljs-keyword">if</span> (r.<span class="hljs-title function_">getNeedAck</span>()) &#123;<br>                        <span class="hljs-keyword">let</span> e = r.<span class="hljs-title function_">getInternalExt</span>(), t = r.<span class="hljs-title function_">getCursor</span>();<br>(a.<span class="hljs-title function_">getHeadersList</span>() || []).<span class="hljs-title function_">forEach</span>((<span class="hljs-function"><span class="hljs-params">i</span>=&gt;</span>&#123;<br>                            <span class="hljs-string">&quot;im-internal_ext&quot;</span> === (<span class="hljs-literal">null</span> == i ? <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> : i.<span class="hljs-title function_">getKey</span>()) &amp;&amp; (e = <span class="hljs-literal">null</span> == i ? <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> : i.<span class="hljs-title function_">getValue</span>()),<br>                            <span class="hljs-string">&quot;im-cursor&quot;</span> === (<span class="hljs-literal">null</span> == i ? <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> : i.<span class="hljs-title function_">getKey</span>()) &amp;&amp; (t = <span class="hljs-literal">null</span> == i ? <span class="hljs-keyword">void</span> <span class="hljs-number">0</span> : i.<span class="hljs-title function_">getValue</span>())<br>                        &#125;<br>                        )),<br>    					<span class="hljs-comment">// 这里是核心部门，数据处理</span><br>                        <span class="hljs-variable language_">this</span>.<span class="hljs-property">internalExt</span> = e,<br>                        <span class="hljs-variable language_">this</span>.<span class="hljs-property">cursor</span> = t;<br>                        <span class="hljs-keyword">const</span> i = <span class="hljs-keyword">new</span> p.<span class="hljs-property">PushFrame</span>;<br>    					<span class="hljs-comment">// ack是 即时消息 ACK机制</span><br>                        i.<span class="hljs-title function_">setPayloadType</span>(<span class="hljs-string">&quot;ack&quot;</span>),<br>                        i.<span class="hljs-title function_">setPayload</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) &#123;<br>                            <span class="hljs-keyword">const</span> t = [];<br>                            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> i <span class="hljs-keyword">of</span> e) &#123;<br>                                <span class="hljs-keyword">const</span> e = i.<span class="hljs-title function_">charCodeAt</span>(<span class="hljs-number">0</span>);<br>                                e &lt; <span class="hljs-number">128</span> ? t.<span class="hljs-title function_">push</span>(e) : e &lt; <span class="hljs-number">2048</span> ? (t.<span class="hljs-title function_">push</span>(<span class="hljs-number">192</span> + (e &gt;&gt; <span class="hljs-number">6</span>)),<br>                                t.<span class="hljs-title function_">push</span>(<span class="hljs-number">128</span> + (<span class="hljs-number">63</span> &amp; e))) : e &lt; <span class="hljs-number">65536</span> &amp;&amp; (t.<span class="hljs-title function_">push</span>(<span class="hljs-number">224</span> + (e &gt;&gt; <span class="hljs-number">12</span>)),<br>                                t.<span class="hljs-title function_">push</span>(<span class="hljs-number">128</span> + (e &gt;&gt; <span class="hljs-number">6</span> &amp; <span class="hljs-number">63</span>)),<br>                                t.<span class="hljs-title function_">push</span>(<span class="hljs-number">128</span> + (<span class="hljs-number">63</span> &amp; e)))<br>                            &#125;<br>                            <span class="hljs-keyword">return</span> <span class="hljs-title class_">Uint8Array</span>.<span class="hljs-title function_">from</span>(t)<br>                        &#125;(e)),<br>                        i.<span class="hljs-title function_">setLogid</span>(a.<span class="hljs-title function_">getLogid</span>()),<br>                        <span class="hljs-variable language_">this</span>.<span class="hljs-property">client</span>.<span class="hljs-property">socket</span>.<span class="hljs-title function_">send</span>(i.<span class="hljs-title function_">serializeBinary</span>())<br>                    &#125;<br></code></pre></td></tr></table></figure>
+
+
+
+<p><img src="/images/image-20230619175528039.png" alt="image-20230619175528039"></p>
+<p>大致的思路就是：n.ec函数处理数据后，然后再来反序列化得到我们要的数据给后面展示，r就是我们要的数据对象，然后如果需要ack就发，最后通过emit函数处理展示值</p>
+<p><img src="/images/image-20230619181546345.png" alt="image-20230619181546345"></p>
+<p>我们看下 n.ec函数，点进去看一下代码，在上面能看到是webpack打包，在下面能看到，这里应该是用来给数据进行压缩获取解压缩</p>
+<p><img src="/images/image-20230619183322882.png" alt="image-20230619183322882"></p>
+<p><img src="/images/image-20230619183423594.png" alt="image-20230619183423594"></p>
+<h3 id="proto文件编写"><a href="#proto文件编写" class="headerlink" title="proto文件编写"></a>proto文件编写</h3><p>接下来我们就要考虑编写proto文件了，我们知道 <code> a = p.PushFrame.deserializeBinary(e.data)</code> 是反序列化后的数据，那我们看下proto对象是怎么写的 点击 <code>p.PushFrame</code> </p>
+<p><img src="/images/image-20230620102517020.png" alt="image-20230620102517020"></p>
+<p>往下拉，我们就能看到 proto对象有哪些字段了，这里需要注意 <code>headersList</code> 字段，<code>headersList</code> 添加了另一个proto对象</p>
+<p><img src="/images/image-20230620102724034.png" alt="image-20230620102724034"></p>
+<p><img src="/images/image-20230620103029726.png" alt="image-20230620103029726"></p>
+<p><code>PushFrame</code> 对象的结构我们就知道了，可以这么写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">message HeadersList &#123;<br>    string key = 1;<br>    string value = 2;<br>&#125;<br><br>message PushFrame &#123;<br>    uint64 seqId = 1;<br>    uint64 logId = 2;<br>    uint64 service = 3;<br>    uint64 method = 4;<br>    repeated HeadersList headersList = 5;<br>    string payloadEncoding = 6;<br>    string payloadType = 7;<br>    bytes payload = 8;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后我们再看下 <code>o.Response</code> 看下响应的结构</p>
+<p><img src="/images/image-20230620103337753.png" alt="image-20230620103337753"></p>
+<p><img src="/images/image-20230620103402400.png" alt="image-20230620103402400"></p>
+<p><code>Response</code> 里面有个 <code>messagesList</code> 里面又有个 <code>message</code>对象, 这里也需要补全</p>
+<p><img src="/images/image-20230620103740743.png" alt="image-20230620103740743"></p>
+<p><img src="/images/image-20230620103800009.png" alt="image-20230620103800009"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">message Message &#123;<br>    string method = 1;<br>    bytes payload = 2;<br>    int64 msgId = 3;<br>    int32 msgType = 4;<br>    int64 offset = 5;<br>    bool needWrdsStore = 6;<br>    int64 wrdsVersion = 7;<br>    string wrdsSubKey = 8;<br>&#125;<br><br>message Response &#123;<br>    repeated Message messagesList = 1;<br>    string cursor = 2;<br>    uint64 fetchInterval = 3;<br>    uint64 now = 4;<br>    string internalExt = 5;<br>    uint32 fetchType = 6;<br>    map&lt;string, string&gt; routeParams = 7;<br>    uint64 heartbeatDuration = 8;<br>    bool needAck = 9;<br>    string pushServer = 10;<br>    string liveCursor = 11;<br>    bool historyNoMore = 12;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>至此，最基本的两个proto对象我们已经写好了，回到源代码里面来，我们知道最后的展示数据是交给了 <code>this.emit(r))</code> 进行处理，我们看下 <code>this.emit()</code>方法 </p>
+<p><img src="/images/image-20230620104604818.png" alt="image-20230620104604818"></p>
+<p><img src="/images/image-20230620104642729.png" alt="image-20230620104642729"></p>
+<p>我们能看到代码里面有个 forEach循环，这里的意思是 它一次性并不是只接收一条数据，最多的时候好像可以接收五条数据，所以这里需要有个for循环来逐一处理，处理的方法是 <code>this.runAllEvents(t, e)</code>，点进来，我们看一下</p>
+<p><img src="/images/image-20230620105021719.png" alt="image-20230620105021719"></p>
+<p>这里就是处理数据类型，通过查看 <code>this.eventsMap</code> 我们可以看到，抖音分了456种数据类型，而此时进来的数据类型是 <code>&quot;WebcastMemberMessage&quot;</code>表示是有新的观众进来， 我们把断点打在下面，多运行几次，我们能看到有很多种不同类型的数据进来。</p>
+<p>我们只拿弹幕，如果要采集其它数据类型，比如礼物啥的，可以看下 gift 字眼的数据类型</p>
+<p><img src="/images/image-20230620105319173.png" alt="image-20230620105319173"></p>
+<p><code>&quot;WebcastChatMessage&quot;</code> 就代表是有观众在发送弹幕，这也就是我们要的数据，这个时候我们可以看一下  <code>s.toObject</code> 就是 <code>WebcastChatMessage</code> 的proto对象<img src="/images/image-20230620105825541.png" alt="image-20230620105825541"></p>
+<p><img src="/images/image-20230620110024791.png" alt="image-20230620110024791"></p>
+<p>进来可以发现字段比较多，但是我们可以精简一下，只要一个 user 和 content就好了，其他的都不重要，而user对象又是另一个proto对象，且user对象也巨长无比，我们也可以精简一下</p>
+<p><img src="/images/image-20230620110131517.png" alt="image-20230620110131517"></p>
+<p><img src="/images/image-20230620111046544.png" alt="image-20230620111046544"></p>
+<p>最终的proto文件就是这样，然后转换成py文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><code class="hljs plaintext">syntax = &quot;proto3&quot;;<br><br>package douyin;<br><br>message HeadersList &#123;<br>    string key = 1;<br>    string value = 2;<br>&#125;<br><br>message PushFrame &#123;<br>    uint64 seqId = 1;<br>    uint64 logId = 2;<br>    uint64 service = 3;<br>    uint64 method = 4;<br>    repeated HeadersList headersList = 5;<br>    string payloadEncoding = 6;<br>    string payloadType = 7;<br>    bytes payload = 8;<br>&#125;<br><br><br>message Message &#123;<br>    string method = 1;<br>    bytes payload = 2;<br>    int64 msgId = 3;<br>    int32 msgType = 4;<br>    int64 offset = 5;<br>    bool needWrdsStore = 6;<br>    int64 wrdsVersion = 7;<br>    string wrdsSubKey = 8;<br>&#125;<br><br>message Response &#123;<br>    repeated Message messagesList = 1;<br>    string cursor = 2;<br>    uint64 fetchInterval = 3;<br>    uint64 now = 4;<br>    string internalExt = 5;<br>    uint32 fetchType = 6;<br>    map&lt;string, string&gt; routeParams = 7;<br>    uint64 heartbeatDuration = 8;<br>    bool needAck = 9;<br>    string pushServer = 10;<br>    string liveCursor = 11;<br>    bool historyNoMore = 12;<br>&#125;<br><br><br>message ChatMessage &#123;<br>    User user = 2;<br>    string content = 3;<br>    bool visibleToSender = 4;<br>&#125;<br><br><br>message User &#123;<br>    uint64 id = 1;<br>    uint64 shortId = 2;<br>    string nickName = 3;<br>    uint32 gender = 4;<br>    string Signature = 5;<br>    uint32 Level = 6;<br>    uint64 Birthday = 7;<br>    string Telephone = 8;<br>    string city = 14;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="代码与展示"><a href="#代码与展示" class="headerlink" title="代码与展示"></a>代码与展示</h3><p>转换完成后，我们就可以开始编写py代码了，建立连接后，最重要的是pb2文件的使用，以及注意我们上面讲的数据解压和发送ack包，最后再根据数据类型的不同进行数据处理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">on_message</span>(<span class="hljs-params">ws, content</span>):<br>    frame = PushFrame()<br>    frame.ParseFromString(content)<br>    <span class="hljs-comment"># 对PushFrame的 payload 内容进行gzip解压</span><br>    origin_bytes = gzip.decompress(frame.payload)<br>    <span class="hljs-comment"># 根据Response+gzip解压数据，生成数据对象</span><br>    response = Response()<br>    response.ParseFromString(origin_bytes)<br>    <span class="hljs-comment"># print(response)</span><br>    <span class="hljs-keyword">if</span> response.needAck:<br>        s = PushFrame()<br>        s.payloadType = <span class="hljs-string">&quot;ack&quot;</span><br>        s.payload = response.internalExt.encode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>        s.logId = frame.logId<br>        ws.send(s.SerializeToString())<br>    <span class="hljs-comment"># 获取数据内容（需根据不同method，使用不同的结构对象对 数据 进行解析）</span><br>    <span class="hljs-comment">#   注意：此处只处理 WebcastChatMessage ，其他处理方式都是类似的。</span><br>    <span class="hljs-keyword">for</span> item <span class="hljs-keyword">in</span> response.messagesList:<br>        <span class="hljs-keyword">if</span> item.method != <span class="hljs-string">&quot;WebcastChatMessage&quot;</span>:<br>            <span class="hljs-keyword">continue</span><br>        message = ChatMessage()<br>        message.ParseFromString(item.payload)<br>        <span class="hljs-keyword">if</span> message.content == <span class="hljs-string">&quot;&quot;</span>:<br>            <span class="hljs-keyword">continue</span><br>        <span class="hljs-keyword">if</span> message.user.gender == <span class="hljs-literal">None</span>:<br>            message.user.gender = <span class="hljs-number">0</span><br>        logger.info(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;message.user.nickName&#125;</span>:<span class="hljs-subst">&#123;message.content&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<p>最终效果展示：</p>
+<p><img src="/images/image-20230620100622021.png" alt="image-20230620100622021"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">LLi</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/05/29/%E6%8A%96%E9%9F%B3protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%9B%B4%E6%92%AD%E5%BC%B9%E5%B9%95%E8%8E%B7%E5%8F%96/">http://example.com/2023/05/29/%E6%8A%96%E9%9F%B3protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%9B%B4%E6%92%AD%E5%BC%B9%E5%B9%95%E8%8E%B7%E5%8F%96/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Spider Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/protobuf/">protobuf</a><a class="post-meta__tags" href="/tags/%E6%8A%96%E9%9F%B3/">抖音</a></div><div class="post_share"><div class="social-share" data-image="/images/image-20230619165907932.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/04/11/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-3/" title="极验滑块验证三个W超详细解密(3)"><img class="cover" src="/images/image-20230527115446875.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">极验滑块验证三个W超详细解密(3)</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/12/16/%E4%B8%87%E6%96%B9protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96/" title="万方protobuf协议解析数据获取"><img class="cover" src="/images/image-20230616160226891.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-16</div><div class="title">万方protobuf协议解析数据获取</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">LLi</div><div class="author-info__description">a spider man</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">36</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/aaLiuQ"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/aaLiuQ" target="_blank" title="Github"><i class="fab fa-github" style="color: #4a7dbe;"></i></a><a class="social-icon" href="mailto:1984145803@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://blog.csdn.net/qq_40138248" target="_blank" title="Csdn"><i class="fas fa-c" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">生而为虫，我很抱歉</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">解析流程：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#proto%E6%96%87%E4%BB%B6%E7%BC%96%E5%86%99"><span class="toc-number">2.</span> <span class="toc-text">proto文件编写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E4%B8%8E%E5%B1%95%E7%A4%BA"><span class="toc-number">3.</span> <span class="toc-text">代码与展示</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/05/29/%E6%8A%96%E9%9F%B3protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%9B%B4%E6%92%AD%E5%BC%B9%E5%B9%95%E8%8E%B7%E5%8F%96/" title="抖音protobuf协议解析直播弹幕获取"><img src="/images/image-20230619165907932.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="抖音protobuf协议解析直播弹幕获取"/></a><div class="content"><a class="title" href="/2023/05/29/%E6%8A%96%E9%9F%B3protobuf%E5%8D%8F%E8%AE%AE%E8%A7%A3%E6%9E%90%E7%9B%B4%E6%92%AD%E5%BC%B9%E5%B9%95%E8%8E%B7%E5%8F%96/" title="抖音protobuf协议解析直播弹幕获取">抖音protobuf协议解析直播弹幕获取</a><time datetime="2023-05-29T07:39:14.000Z" title="发表于 2023-05-29 15:39:14">2023-05-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/11/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-3/" title="极验滑块验证三个W超详细解密(3)"><img src="/images/image-20230527115446875.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="极验滑块验证三个W超详细解密(3)"/></a><div class="content"><a class="title" href="/2023/04/11/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-3/" title="极验滑块验证三个W超详细解密(3)">极验滑块验证三个W超详细解密(3)</a><time datetime="2023-04-11T11:13:15.000Z" title="发表于 2023-04-11 19:13:15">2023-04-11</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/05/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-2/" title="极验滑块验证三个W超详细解密(2)"><img src="/images%5Cimage-20230527114721325.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="极验滑块验证三个W超详细解密(2)"/></a><div class="content"><a class="title" href="/2023/03/05/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-2/" title="极验滑块验证三个W超详细解密(2)">极验滑块验证三个W超详细解密(2)</a><time datetime="2023-03-05T13:06:05.000Z" title="发表于 2023-03-05 21:06:05">2023-03-05</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/04/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-1/" title="极验滑块验证三个W超详细解密(1)"><img src="/images/image-20230527110525991.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="极验滑块验证三个W超详细解密(1)"/></a><div class="content"><a class="title" href="/2023/03/04/%E6%9E%81%E9%AA%8C%E6%BB%91%E5%9D%97%E9%AA%8C%E8%AF%81%E4%B8%89%E4%B8%AAW%E8%B6%85%E8%AF%A6%E7%BB%86%E8%A7%A3%E5%AF%86-1/" title="极验滑块验证三个W超详细解密(1)">极验滑块验证三个W超详细解密(1)</a><time datetime="2023-03-04T03:02:49.000Z" title="发表于 2023-03-04 11:02:49">2023-03-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/03/01/%E8%A1%A5%E7%8E%AF%E5%A2%83%E6%89%A3%E4%BB%A3%E7%A0%81%E8%BF%87%E7%91%9E%E6%95%B04/" title="补环境扣代码过瑞数4"><img src="/images/image-20230603104101440.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="补环境扣代码过瑞数4"/></a><div class="content"><a class="title" href="/2023/03/01/%E8%A1%A5%E7%8E%AF%E5%A2%83%E6%89%A3%E4%BB%A3%E7%A0%81%E8%BF%87%E7%91%9E%E6%95%B04/" title="补环境扣代码过瑞数4">补环境扣代码过瑞数4</a><time datetime="2023-03-01T07:10:43.000Z" title="发表于 2023-03-01 15:10:43">2023-03-01</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer_button"><ul class="buttons"><li class="icon Email"><span class="bubble">Email</span><a href="mailto:1984145803@qq.com"><i class="fa-solid fa-envelope"></i></a></li><li class="icon QQ"><span class="bubble">QQ</span><a href="tencent://Message/?Uin=198414&amp;websiteName=q-zone.qq.com&amp;Menu=yes"><i class="fa-brands fa-qq"></i></a></li><li class="icon top"><span class="bubble">top</span><a href="#"><i class="fa-solid fa-angle-up"></i></a></li><li class="icon github"><span class="bubble">Github</span><a target="_blank" rel="noopener" href="https://github.com/aaLiuQ"><i class="fab fa-github"></i></a></li><li class="icon CSDN"><span class="bubble">CSDN</span><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_40138248"><i class="fa-solid fa-copyright"></i></a></li></ul></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
